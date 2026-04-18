@@ -1,0 +1,10 @@
+run,best_val_epoch,best_val_lb,best_val_offence,best_val_action,test_at_best_val_epoch,test_at_best_val_lb,test_at_best_val_offence,test_at_best_val_action
+THESIS_mean_s1,10,40.3337,43.7014,36.966,10,32.8904,33.6838,32.097
+THESIS_mean_s2,12,36.2273,33.1702,39.2845,12,38.4128,37.1103,39.7154
+THESIS_mean_s3,15,39.1022,40.708,37.4965,15,32.0425,33.6372,30.4479
+THESIS_attention_s1,18,40.4317,42.9974,37.8659,18,36.7679,38.8114,34.7243
+THESIS_attention_s2,9,38.6059,41.9929,35.2189,9,34.1647,33.9566,34.3728
+THESIS_attention_s3,19,39.3259,41.3662,37.2856,19,34.8383,31.5529,38.1237
+THESIS_cross_attention_s1,17,42.1057,45.0578,39.1535,17,35.9981,39.3138,32.6824
+THESIS_cross_attention_s2,14,39.1016,40.8167,37.3866,14,31.5734,32.0457,31.101
+THESIS_cross_attention_s3,20,38.6495,36.6043,40.6947,20,31.8225,28.7178,34.9271

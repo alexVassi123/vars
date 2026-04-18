@@ -120,17 +120,23 @@ class TransformerAggregate(nn.Module):
 
 
 class CrossAttentionAggregate(nn.Module):
-    def __init__(self, model, feat_dim, num_heads=8, lifting_net=nn.Sequential()):
+  
+    def __init__(self, model, feat_dim, num_heads=8, num_queries=2, lifting_net=nn.Sequential()):
         super().__init__()
         self.model = model
         self.lifting_net = lifting_net
         self.feat_dim = feat_dim
+        self.num_queries = num_queries
+
+        # Learnable task-query tokens. Small init (0.02) to match standard
+        # Transformer-style parameter initialisation.
+        self.query_tokens = nn.Parameter(torch.randn(num_queries, feat_dim) * 0.02)
 
         self.cross_attention = nn.MultiheadAttention(
             embed_dim=feat_dim,
             num_heads=num_heads,
             dropout=0.1,
-            batch_first=True
+            batch_first=True,
         )
         self.norm = nn.LayerNorm(feat_dim)
 
@@ -139,25 +145,25 @@ class CrossAttentionAggregate(nn.Module):
         # Extract per-view features: (B, V, feat_dim)
         aux = self.lifting_net(unbatch_tensor(
             self.model(batch_tensor(mvimages, dim=1, squeeze=True)),
-            B, dim=1, unsqueeze=True
+            B, dim=1, unsqueeze=True,
         ))
 
-        # Each view attends to all other views (Q=K=V=aux)
-        # attention_weights: (B, V, V) — pairwise view attention matrix
+        # Expand query tokens to batch: (B, num_queries, feat_dim)
+        q = self.query_tokens.unsqueeze(0).expand(B, -1, -1)
+
+        # Cross-attention: task queries attend to view features.
+        # attention_weights shape: (B, num_queries, V) — per-task view importance.
         attended, attention_weights = self.cross_attention(
-            query=aux, key=aux, value=aux, need_weights=True, average_attn_weights=True
+            query=q, key=aux, value=aux,
+            need_weights=True, average_attn_weights=True,
         )
+        attended = self.norm(attended)  # (B, num_queries, feat_dim)
 
-        # Residual + norm
-        attended = self.norm(attended + aux)
-
-        # Mean pool across views: (B, feat_dim)
+        # Pool across query tokens so the downstream heads see (B, feat_dim),
+        # keeping the comparison against other aggregation methods clean.
         pooled = torch.mean(attended, dim=1)
 
-        # How much attention each view receives: (B, V)
-        view_importance = attention_weights.sum(dim=1)
-
-        return pooled.squeeze(), view_importance
+        return pooled.squeeze(), attention_weights
 
 
 class MVAggregate(nn.Module):
