@@ -1,15 +1,5 @@
-"""Extract cross-attention weights from a trained checkpoint on the test set.
 
-For each test sample, runs forward pass and saves the (num_queries, V)
-attention tensor along with the ground-truth action class and offence label.
-Output is a JSON with per-sample entries, ready for notebook analysis.
 
-Usage:
-    python "VARS model/extract_attention.py" \
-        --checkpoint models/THESIS_cross_attention_s1/.../best_model.pth.tar \
-        --path data/SoccerNet/mvfouls \
-        --output cross_attention_weights.json
-"""
 import os
 import json
 import argparse
@@ -32,7 +22,7 @@ def main():
     parser.add_argument("--start_frame", type=int, default=20)
     parser.add_argument("--end_frame", type=int, default=100)
     parser.add_argument("--fps", type=int, default=10)
-    parser.add_argument("--output", default="cross_attention_weights.json")
+    parser.add_argument("--output", default="weights/cross_attention_weights.json")
     parser.add_argument("--num_workers", type=int, default=8)
     args = parser.parse_args()
 
