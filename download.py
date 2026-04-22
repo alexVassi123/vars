@@ -15,7 +15,7 @@ for split in ["train", "valid", "test", "challenge"]:
             print(f"Failed: {e}. Retrying in 5s...")
             time.sleep(5)
 
-# Unzip each split into its own correctly named folder
+
 splits = {
     "train": "Train",
     "valid": "Valid",

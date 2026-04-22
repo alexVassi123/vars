@@ -15,9 +15,7 @@ from model import MVNetwork
 
 
 def set_seed(seed):
-    """Seed python, numpy, torch (cpu+cuda) for reproducible runs.
-    Used for seed ensembling — different --seed values give different weights
-    at convergence even with identical hyperparameters."""
+   
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -25,13 +23,7 @@ def set_seed(seed):
 
 
 class FocalLoss(nn.Module):
-    """Focal loss for multi-class classification with optional class weights.
 
-    Accepts one-hot targets (which is what the dataset provides) or class indices.
-    gamma=2 down-weights easy examples so gradient focuses on hard/minority
-    classes. Replaces WeightedRandomSampler which caused minority-class
-    memorization in run 5 (train LB 60 / val LB 30 gap).
-    """
     def __init__(self, weight=None, gamma=2.0):
         super().__init__()
         self.weight = weight
@@ -133,8 +125,7 @@ def main(*args):
         print("EXIT")
         exit()
 
-    # Seed everything up front so dataloader workers, weight init, and
-    # dropout are reproducible across runs with the same --seed.
+    
     set_seed(seed)
     print(f"Using seed={seed}")
 
@@ -161,7 +152,7 @@ def main(*args):
             logging.StreamHandler()
         ])
 
-    # Initialize the data augmentation
+    
     if data_aug == 'Yes':
         transformAug = transforms.Compose([
                                           transforms.RandomAffine(degrees=(0, 0), translate=(0.1, 0.1), scale=(0.9, 1)),
@@ -225,10 +216,7 @@ def main(*args):
         dataset_Test2 = MultiViewDataset(path=path, start=start_frame, end=end_frame, fps=fps, split='Test', num_views = 5, 
             transform_model=transforms_model)
 
-        # Create the dataloaders for train validation and test datasets
-        # NOTE: Uniform sampling. WeightedRandomSampler caused minority-class
-        # memorization (run 5 train LB 60 / val LB 30 gap). Rely on
-        # weighted CrossEntropy loss for class imbalance instead.
+    
         # persistent_workers + prefetch_factor=4: full-frame video decode is the
         # bottleneck (GPU at 0% util), keep workers warm and queue full.
         train_loader = torch.utils.data.DataLoader(dataset_Train,
@@ -262,7 +250,7 @@ def main(*args):
                                     betas=(0.9, 0.999), eps=1e-07,
                                     weight_decay=weight_decay, amsgrad=False)
 
-        # Warmup for 3 epochs then cosine decay
+        
         warmup_epochs = 3
         warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=warmup_epochs)
         cosine_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epochs - warmup_epochs, eta_min=1e-7)
@@ -279,9 +267,7 @@ def main(*args):
             epoch_start = load['epoch']
 
 
-        # Focal loss (gamma=2) naturally focuses on hard/minority examples.
-        # With severe class imbalance (27 Red card vs 1038 Standing tackling)
-        # focal loss is the right lever — oversampling caused memorization.
+    
         if weighted_loss == 'Yes':
             criterion_offence_severity = FocalLoss(weight=dataset_Train.getWeights()[0].cuda(), gamma=2.0)
             criterion_action = FocalLoss(weight=dataset_Train.getWeights()[1].cuda(), gamma=2.0)
@@ -292,7 +278,7 @@ def main(*args):
             criterion = [criterion_offence_severity, criterion_action]
 
 
-    # Start training or evaluation
+    
     if only_evaluation == 0:
         prediction_file = evaluation(
             test_loader2,
@@ -309,7 +295,7 @@ def main(*args):
             model,
             set_name="chall",
         )
-        # Chall set has no public annotations — just write predictions for submission.
+        
         print(f"CHALL predictions written to: {prediction_file}")
 
     elif only_evaluation == 2:
@@ -371,16 +357,16 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    ## Checking if arguments are valid
+    
     checkArguments()
 
-    # Setup the GPU
+    
     if args.GPU >= 0:
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(args.GPU)
 
 
-    # Start the main training function
+    
     start=time.time()
     logging.info('Starting main function')
     main(args, False)

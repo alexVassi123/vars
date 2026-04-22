@@ -128,8 +128,6 @@ class CrossAttentionAggregate(nn.Module):
         self.feat_dim = feat_dim
         self.num_queries = num_queries
 
-        # Learnable task-query tokens. Small init (0.02) to match standard
-        # Transformer-style parameter initialisation.
         self.query_tokens = nn.Parameter(torch.randn(num_queries, feat_dim) * 0.02)
 
         self.cross_attention = nn.MultiheadAttention(

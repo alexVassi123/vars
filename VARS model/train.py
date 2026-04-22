@@ -117,7 +117,7 @@ def trainer(train_loader,
 
         # Early stopping based on validation leaderboard value
         val_lb = results['leaderboard_value'] if 'leaderboard_value' in results else 0.0
-        # Re-evaluate validation for early stopping (test results is in `results` now, so re-read val)
+      
         val_results = evaluate(os.path.join(path_dataset, "Valid", "annotations.json"),
                                os.path.join(run_dir, "predicitions_valid_epoch_" + str(epoch + 1) + ".json"))
         val_lb = val_results['leaderboard_value']
@@ -266,7 +266,7 @@ def train(dataloader,
 
 
 
-# Evaluation function to evaluate the test or the chall set
+
 def evaluation(dataloader,
           model,
           set_name="test",
