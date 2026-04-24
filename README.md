@@ -59,7 +59,7 @@ Het volledige experimentele protocol (methoden, seeds, hyperparameters, metrieke
 
 Mijn beste methode (weighted attention) haalt gemiddeld een test LB van 35.26. De hoogste score op de SoccerNet-MVFoul leaderboard ligt rond de 48. Dat is duidelijk hoger, maar ook de rest van de leaderboard zit in een vergelijkbaar bereik als mijn scores. De dataset is klein (2916 trainingsacties), veel klassen zijn zeldzaam en het verschil tussen bijvoorbeeld geel en rood is vaak subtiel.
 
-De topscores gebruiken doorgaans een zwaardere backbone (MViT-v2 of VideoMAE in plaats van R(2+1)D-18) die end-to-end wordt fijngetuned. Bij mij staat de backbone bevroren om de training binnen het budget van een RTX 4090 te houden. Een beter backbone en end-to-end fine-tunen zou de absolute scores waarschijnlijk omhoog trekken, maar dat was niet het doel van deze thesis. Ik vergelijk aggregatiemethoden onderling bij dezelfde backbone, dus de absolute waarde van de score is minder belangrijk dan het verschil tussen methoden.
+De topscores gebruiken doorgaans een zwaardere backbone (MViT-v2 of VideoMAE in plaats van R(2+1)D-18). Bij mij wordt de R(2+1)D-18 backbone end-to-end gefinetuned, maar dat is een kleiner en ouder model dan de video transformers die bovenaan de leaderboard staan. Een sterkere backbone zou de absolute scores waarschijnlijk omhoog trekken, maar dat was niet het doel van deze thesis. Ik vergelijk aggregatiemethoden onderling bij dezelfde backbone, dus de absolute waarde van de score is minder belangrijk dan het verschil tussen methoden.
 
 ## Referentie
 
